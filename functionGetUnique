@@ -1,0 +1,18 @@
+getUniqObs<-function(tab=c("DM","CM"),cores=2) {
+  
+  myList<-mclapply(tab,function(indx) {
+    
+    myColN<-ds.colnames(x=indx)  
+    
+    ##tjeck 1) only one subjID coloumn.
+    nSub<-which(unlist(myColN) %in% "SUBJID")
+    stopifnot(length(nSub) == 1)
+    
+    ds.asFactor(paste(indx,"SUBJID",sep="$"),newobj = "myFactor")
+    uniqID<-length(unlist(ds.levels("myFactor")))
+    return(c(indx,uniqID)) 
+  },mc.cores=cores)
+  dat<-data.frame(matrix(unlist(myList),ncol=2,byrow=T),stringsAsFactors = F)  
+  colnames(dat)<-c("Tables","uniqID")
+  return(dat)
+  }
